@@ -1,0 +1,26 @@
+{
+  "name": "pro-mern-stack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon -w server server/server.js",
+    "compile": "babel src --out-dir public",
+    "watch": "babel src --out-dir public --watch --verbose"
+  },
+  "author": "Deon Odendaal",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server-express": "^2.9.12",
+    "express": "^4.17.1",
+    "graphql": "^14.5.8"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.2",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/preset-react": "^7.7.0",
+    "nodemon": "^1.19.4"
+  }
+}
