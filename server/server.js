@@ -34,7 +34,7 @@ function setAboutMessage(_, { message }) {
 // The constructor takes the schema and resolvers as properties, and
 // returns a GraphQL server object
 const server = new ApolloServer({
-  // read the typeDefs from the GraphQL shema file
+  // read the typeDefs from the GraphQL schema file
   typeDefs: fs.readFileSync("./server/schema.graphql", "utf-8"),
   resolvers
 });
