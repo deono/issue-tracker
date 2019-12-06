@@ -1,6 +1,7 @@
 const fs = require("fs"); // required to read the GraphQL schema file
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
+const { GraphQLScalarType } = require("graphql");
 
 // ================
 // GraphQL
@@ -27,6 +28,16 @@ const issuesDB = [
     title: "Missing bottom border on panel"
   }
 ];
+
+// construct custom Date scalar type resolver
+const GraphQLDate = new GraphQLScalarType({
+  name: "GraphQLDate",
+  description: "A Date() type in GraphQl as a scalar",
+  serialize(value) {
+    return value.toISOString(); // convert a Date to a String in ISO 8601 format
+  }
+});
+
 // handlers / resolvers
 // follows the same structure of the schema
 const resolvers = {
@@ -39,7 +50,8 @@ const resolvers = {
     // using ES2015 property assignment shorthand syntax
     // { setAboutMessage: setAboutMessage }
     setAboutMessage
-  }
+  },
+  GraphQLDate
 };
 
 // resolver functions take 4 arguments: obj, args, context & info.
