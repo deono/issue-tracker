@@ -7,12 +7,32 @@ const { ApolloServer } = require("apollo-server-express");
 // ================
 let aboutMessage = "Issue Tracker API v1.0";
 
+const issuesDB = [
+  {
+    id: 1,
+    status: "New",
+    owner: "Ravan",
+    effort: 5,
+    created: new Date("2019-01-15"),
+    due: undefined,
+    title: "Error in console when clicking Add"
+  },
+  {
+    id: 2,
+    status: "Assigned",
+    owner: "Eddie",
+    effort: 14,
+    created: new Date("2019-01-16"),
+    due: new Date("2019-01-01"),
+    title: "Missing bottom border on panel"
+  }
+];
 // handlers / resolvers
 // follows the same structure of the schema
 const resolvers = {
   Query: {
-    // function that returns the aboutMessage varaible
-    about: () => aboutMessage
+    about: () => aboutMessage, // function that returns the aboutMessage varaible
+    issueList: () => issuesDB // return the issueDB
   },
   Mutation: {
     // setAboutMessage function assigned as the resolver

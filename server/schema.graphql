@@ -12,7 +12,7 @@ type Issue {
 
 type Query {
   about: String!
-  issueList: [Issue!]!
+  issueList: [Issue!]! # Return value is mandatory, and each element in the array cannot be null
 }
 type Mutation {
   setAboutMessage(message: String!): String
