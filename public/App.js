@@ -37,26 +37,7 @@ function (_React$Component) {
   }]);
 
   return IssueFilter;
-}(React.Component); // array of issues
-
-
-var initialIssues = [{
-  id: 1,
-  status: "New",
-  owner: "Ravan",
-  effort: 5,
-  created: new Date("2018-08-15"),
-  due: undefined,
-  title: "Error in console when clicking Add"
-}, {
-  id: 2,
-  status: "Assigned",
-  owner: "Eddie",
-  effort: 14,
-  created: new Date("2018-08-16"),
-  due: new Date("2018-08-30"),
-  title: "Missing bottom border on panel"
-}];
+}(React.Component);
 
 function IssueTable(props) {
   var issueRows = props.issues.map(function (issue) {
@@ -79,7 +60,7 @@ function IssueRow(props) {
       effort = _props$issue.effort,
       due = _props$issue.due,
       title = _props$issue.title;
-  return React.createElement("tr", null, React.createElement("td", null, id), React.createElement("td", null, status), React.createElement("td", null, owner), React.createElement("td", null, created.toDateString()), React.createElement("td", null, effort), React.createElement("td", null, due ? due.toDateString() : ""), React.createElement("td", null, title));
+  return React.createElement("tr", null, React.createElement("td", null, id), React.createElement("td", null, status), React.createElement("td", null, owner), React.createElement("td", null, created), React.createElement("td", null, effort), React.createElement("td", null, due), React.createElement("td", null, title));
 }
 
 var IssueAdd =
@@ -146,6 +127,7 @@ function (_React$Component3) {
     _this2.state = {
       issues: []
     };
+    _this2.createIssue = _this2.createIssue.bind(_assertThisInitialized(_this2));
     return _this2;
   }
 
@@ -157,14 +139,44 @@ function (_React$Component3) {
   }, {
     key: "loadData",
     value: function loadData() {
-      var _this3 = this;
+      var query, response, result;
+      return regeneratorRuntime.async(function loadData$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              // construct GraphQL query
+              query = "query {\n      issueList {\n        id title status owner created effort due\n      }\n    }"; // send the query string as the value for the query property within a JSON
+              // as part of the body to the fetch requst
 
-      setTimeout(function () {
-        _this3.setState({
-          issues: initialIssues
-        });
-      }, 500);
-      this.createIssue = this.createIssue.bind(this);
+              _context.next = 3;
+              return regeneratorRuntime.awrap(fetch("/graphql", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  query: query
+                })
+              }));
+
+            case 3:
+              response = _context.sent;
+              _context.next = 6;
+              return regeneratorRuntime.awrap(response.json());
+
+            case 6:
+              result = _context.sent;
+              // set the state with the result data
+              this.setState({
+                issues: result.data.issueList
+              });
+
+            case 8:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "createIssue",

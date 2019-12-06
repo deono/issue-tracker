@@ -4,28 +4,6 @@ class IssueFilter extends React.Component {
   }
 }
 
-// array of issues
-const initialIssues = [
-  {
-    id: 1,
-    status: "New",
-    owner: "Ravan",
-    effort: 5,
-    created: new Date("2018-08-15"),
-    due: undefined,
-    title: "Error in console when clicking Add"
-  },
-  {
-    id: 2,
-    status: "Assigned",
-    owner: "Eddie",
-    effort: 14,
-    created: new Date("2018-08-16"),
-    due: new Date("2018-08-30"),
-    title: "Missing bottom border on panel"
-  }
-];
-
 function IssueTable(props) {
   const issueRows = props.issues.map(issue => (
     <IssueRow key={issue.id} issue={issue} />
@@ -58,9 +36,9 @@ function IssueRow(props) {
       <td>{id}</td>
       <td>{status}</td>
       <td>{owner}</td>
-      <td>{created.toDateString()}</td>
+      <td>{created}</td>
       <td>{effort}</td>
-      <td>{due ? due.toDateString() : ""}</td>
+      <td>{due}</td>
       <td>{title}</td>
     </tr>
   );
@@ -102,18 +80,31 @@ class IssueList extends React.Component {
   constructor() {
     super();
     this.state = { issues: [] };
+    this.createIssue = this.createIssue.bind(this);
   }
 
   componentDidMount() {
     this.loadData();
   }
 
-  loadData() {
-    setTimeout(() => {
-      this.setState({ issues: initialIssues });
-    }, 500);
-
-    this.createIssue = this.createIssue.bind(this);
+  async loadData() {
+    // construct GraphQL query
+    const query = `query {
+      issueList {
+        id title status owner created effort due
+      }
+    }`;
+    // send the query string as the value for the query property within a JSON
+    // as part of the body to the fetch requst
+    const response = await fetch("/graphql", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query })
+    });
+    // convert the JSON data in the response to a JavaScript object and store as the result
+    const result = await response.json();
+    // set the state with the result data
+    this.setState({ issues: result.data.issueList });
   }
 
   createIssue(issue) {
