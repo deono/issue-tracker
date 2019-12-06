@@ -47,7 +47,7 @@ var initialIssues = [{
   effort: 5,
   created: new Date("2018-08-15"),
   due: undefined,
-  title: "Errror in console when clicking Add"
+  title: "Error in console when clicking Add"
 }, {
   id: 2,
   status: "Assigned",
