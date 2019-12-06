@@ -18,6 +18,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+var dateRegex = new RegExp("^\\d\\d\\d\\d-\\d\\d-\\d\\d"); // convert date strings to native JS Date types
+
+function jsonDateReviver(key, value) {
+  if (dateRegex.test(value)) {
+    // if the value is a date string
+    return new Date(value); // convert to native JS Date type
+  }
+
+  return value;
+}
+
 var IssueFilter =
 /*#__PURE__*/
 function (_React$Component) {
@@ -60,7 +71,7 @@ function IssueRow(props) {
       effort = _props$issue.effort,
       due = _props$issue.due,
       title = _props$issue.title;
-  return React.createElement("tr", null, React.createElement("td", null, id), React.createElement("td", null, status), React.createElement("td", null, owner), React.createElement("td", null, created), React.createElement("td", null, effort), React.createElement("td", null, due), React.createElement("td", null, title));
+  return React.createElement("tr", null, React.createElement("td", null, id), React.createElement("td", null, status), React.createElement("td", null, owner), React.createElement("td", null, created.toDateString()), React.createElement("td", null, effort), React.createElement("td", null, due ? due.toDateString() : ""), React.createElement("td", null, title));
 }
 
 var IssueAdd =
@@ -139,7 +150,7 @@ function (_React$Component3) {
   }, {
     key: "loadData",
     value: function loadData() {
-      var query, response, result;
+      var query, response, body, result;
       return regeneratorRuntime.async(function loadData$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -162,16 +173,18 @@ function (_React$Component3) {
             case 3:
               response = _context.sent;
               _context.next = 6;
-              return regeneratorRuntime.awrap(response.json());
+              return regeneratorRuntime.awrap(response.text());
 
             case 6:
-              result = _context.sent;
-              // set the state with the result data
+              body = _context.sent;
+              // the jsonDateReviver parses date string to native JS Date types
+              result = JSON.parse(body, jsonDateReviver); // set the state with the result data
+
               this.setState({
                 issues: result.data.issueList
               });
 
-            case 8:
+            case 9:
             case "end":
               return _context.stop();
           }

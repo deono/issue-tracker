@@ -1,3 +1,14 @@
+const dateRegex = new RegExp("^\\d\\d\\d\\d-\\d\\d-\\d\\d");
+
+// convert date strings to native JS Date types
+function jsonDateReviver(key, value) {
+  if (dateRegex.test(value)) {
+    // if the value is a date string
+    return new Date(value); // convert to native JS Date type
+  }
+  return value;
+}
+
 class IssueFilter extends React.Component {
   render() {
     return <div>IssueFilter</div>;
@@ -36,9 +47,9 @@ function IssueRow(props) {
       <td>{id}</td>
       <td>{status}</td>
       <td>{owner}</td>
-      <td>{created}</td>
+      <td>{created.toDateString()}</td>
       <td>{effort}</td>
-      <td>{due}</td>
+      <td>{due ? due.toDateString() : ""}</td>
       <td>{title}</td>
     </tr>
   );
@@ -102,7 +113,9 @@ class IssueList extends React.Component {
       body: JSON.stringify({ query })
     });
     // convert the JSON data in the response to a JavaScript object and store as the result
-    const result = await response.json();
+    const body = await response.text();
+    // the jsonDateReviver parses date string to native JS Date types
+    const result = JSON.parse(body, jsonDateReviver);
     // set the state with the result data
     this.setState({ issues: result.data.issueList });
   }
