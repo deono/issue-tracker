@@ -62,6 +62,18 @@ function setAboutMessage(_, { message }) {
   return (aboutMessage = message);
 }
 
+// resolver takes an IssueInput type as argument and creates a new issue in the DB
+function issueAdd(_, { issue }) {
+  issue.created = new Date();
+  issue.id = issueDB.length + 1;
+  // set the default status
+  if (issue.status == undefined) issue.status = "New";
+  // append the issue to the global variable issueDB
+  issueDB.push(issue);
+  // return the issue object
+  return issue;
+}
+
 // initialize the GraphQL server, which is an AppoloServer object
 // The constructor takes the schema and resolvers as properties, and
 // returns a GraphQL server object
