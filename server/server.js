@@ -2,6 +2,7 @@ const fs = require("fs"); // required to read the GraphQL schema file
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
 const { GraphQLScalarType } = require("graphql");
+const { Kind } = require("graphql/language");
 
 // ================
 // GraphQL
@@ -35,6 +36,17 @@ const GraphQLDate = new GraphQLScalarType({
   description: "A Date() type in GraphQl as a scalar",
   serialize(value) {
     return value.toISOString(); // convert a Date to a String in ISO 8601 format
+  },
+  // parsers for receiving date values:
+  // parseLiteral is used in the normal case where the field is specified in-place in the query
+  parseLiteral(ast) {
+    // ast.kind indicates the type of property the parser found (float, integer or string)
+    // undefined indicates the type could not be converted, and treated as an error
+    return ast.kind == Kind.STRING ? new Date(ast.value) : undefined;
+  },
+  // parseValue is called if the input type is a variable (JS object)
+  parseValue(value) {
+    return new Date(value);
   }
 });
 
@@ -49,7 +61,9 @@ const resolvers = {
     // setAboutMessage function assigned as the resolver
     // using ES2015 property assignment shorthand syntax
     // { setAboutMessage: setAboutMessage }
-    setAboutMessage
+    setAboutMessage,
+    // issueAdd function assigned as resolver
+    issueAdd
   },
   GraphQLDate
 };
@@ -65,11 +79,11 @@ function setAboutMessage(_, { message }) {
 // resolver takes an IssueInput type as argument and creates a new issue in the DB
 function issueAdd(_, { issue }) {
   issue.created = new Date();
-  issue.id = issueDB.length + 1;
+  issue.id = issuesDB.length + 1;
   // set the default status
   if (issue.status == undefined) issue.status = "New";
   // append the issue to the global variable issueDB
-  issueDB.push(issue);
+  issuesDB.push(issue);
   // return the issue object
   return issue;
 }
