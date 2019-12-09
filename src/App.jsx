@@ -67,7 +67,9 @@ class IssueAdd extends React.Component {
     const issue = {
       owner: form.owner.value,
       title: form.title.value,
-      status: "New"
+      // status: "New",
+      // set the due date 10 days from the current date
+      due: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10)
     };
     this.props.createIssue(issue);
     form.owner.value = "";
@@ -98,6 +100,7 @@ class IssueList extends React.Component {
     this.loadData();
   }
 
+  // get a list of issues from the issues DB
   async loadData() {
     // construct GraphQL query
     const query = `query {
@@ -120,12 +123,34 @@ class IssueList extends React.Component {
     this.setState({ issues: result.data.issueList });
   }
 
-  createIssue(issue) {
-    issue.id = this.state.issues.length + 1;
-    issue.created = new Date();
-    const newIssueList = this.state.issues.slice();
-    newIssueList.push(issue);
-    this.setState({ issues: newIssueList });
+  // createIssue(issue) {
+  //   issue.id = this.state.issues.length + 1;
+  //   issue.created = new Date();
+  //   const newIssueList = this.state.issues.slice();
+  //   newIssueList.push(issue);
+  //   this.setState({ issues: newIssueList });
+  // }
+
+  // Add a new issue to the issues database
+  async createIssue(issue) {
+    // GraphQl query
+    const query = `mutation {
+      issueAdd(issue:{
+        title: "${issue.title}",
+        owner: "${issue.owner}",
+        due: "${issue.due.toISOString()}"
+      }) {
+        id
+      }
+    }`;
+    // use the query to execute fetch asyncronously
+    const response = await fetch("/graphql", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query })
+    });
+    // refresh the list of issues
+    this.loadData();
   }
 
   render() {

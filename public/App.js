@@ -97,7 +97,9 @@ function (_React$Component2) {
       var issue = {
         owner: form.owner.value,
         title: form.title.value,
-        status: "New"
+        // status: "New",
+        // set the due date 10 days from the current date
+        due: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10)
       };
       this.props.createIssue(issue);
       form.owner.value = "";
@@ -146,7 +148,8 @@ function (_React$Component3) {
     key: "componentDidMount",
     value: function componentDidMount() {
       this.loadData();
-    }
+    } // get a list of issues from the issues DB
+
   }, {
     key: "loadData",
     value: function loadData() {
@@ -190,17 +193,48 @@ function (_React$Component3) {
           }
         }
       }, null, this);
-    }
+    } // createIssue(issue) {
+    //   issue.id = this.state.issues.length + 1;
+    //   issue.created = new Date();
+    //   const newIssueList = this.state.issues.slice();
+    //   newIssueList.push(issue);
+    //   this.setState({ issues: newIssueList });
+    // }
+    // Add a new issue to the issues database
+
   }, {
     key: "createIssue",
     value: function createIssue(issue) {
-      issue.id = this.state.issues.length + 1;
-      issue.created = new Date();
-      var newIssueList = this.state.issues.slice();
-      newIssueList.push(issue);
-      this.setState({
-        issues: newIssueList
-      });
+      var query, response;
+      return regeneratorRuntime.async(function createIssue$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              // GraphQl query
+              query = "mutation {\n      issueAdd(issue:{\n        title: \"".concat(issue.title, "\",\n        owner: \"").concat(issue.owner, "\",\n        due: \"").concat(issue.due.toISOString(), "\"\n      }) {\n        id\n      }\n    }"); // use the query to execute fetch asyncronously
+
+              _context2.next = 3;
+              return regeneratorRuntime.awrap(fetch("/graphql", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  query: query
+                })
+              }));
+
+            case 3:
+              response = _context2.sent;
+              // refresh the list of issues
+              this.loadData();
+
+            case 5:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "render",
